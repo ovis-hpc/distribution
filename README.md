@@ -35,6 +35,8 @@ Most of the packaging examples collected here include a scripted step to downloa
 sources from github. An example of modifying these scripts to work
 on an isolated machine is given in [OffGrid.md](OffGrid.md).
 
+Many sites with Internet access will need to set the https_proxy variable to enable external git repository access. If you see a git clone or curl or wget hung during build, interrupt it and verify https_proxy and http_proxy are set per your site guidelines.
+
 ## Making test packages and contributing recipes
 Make your own fork of the repository to work on unstable recipes. Contribute new directories (recipes) for this repository by making a pull request.
 
