@@ -3,16 +3,16 @@ Each directory is self-documenting. Recipes that can be used for complete builds
 
 The directories follow a naming convention to aid new users in identifying which example to examine first. The convention is:
 
-	$release-or-branch.$OS.$subtype.\[feature.\]\*.
+	$release-or-branch.$OS.$subtype[.feature]*
 
 for example 
 * OVIS-4.rhel7.base.nopython: builds v4 branch tip without python bindings on Redhat installing to LHS/FSB locations as interpretted by redhat packaging guidelines.
-* OVIS-4.rhel7.base.optanaconda3: builds v4 branch tip with python assuming /opt/anaconda/3 created outside the RPM packaging system.
+* OVIS-4.rhel7.base.opt_anaconda_3: builds v4 branch tip with python assuming /opt/anaconda/3 created outside the RPM packaging system.
 * OVIS-4.rhel7.sc: builds v4 branch tip packaged following Redhat 7 Software Collections guide
 * OVIS-4.u18.base: builds for standard Ubuntu 18 environment (provides example debian/ directory)
 * OVIS-4.CLE7.base: builds v4 branch tip packaged for Cray Linux Environment 7
 
-Notable values of subtype thus far are base, and sc. Use epel as an OS name, since EPEL introduces many packaging incompatibilities via newer versions, or example libssl.
+Notable values of subtype thus far are base, and sc. Use epel as an OS name, since EPEL introduces many packaging incompatibilities via newer versions, for example libssl.
 
 ## Making packages
 
@@ -51,8 +51,9 @@ Review the recipes listing python as a feature.
 ## Platform packaging guides
 
 Debian/Ubuntu
-[https://wiki.debian.org/Packaging]
-[https://packaging.ubuntu.com/html/]
+https://wiki.debian.org/Packaging
+https://packaging.ubuntu.com/html/
+
 Software Collections
 https://access.redhat.com/documentation/en-us/red_hat_software_collections/1/html/packaging_guide/index
 https://www.softwarecollections.org/en/docs/
