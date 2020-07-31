@@ -38,6 +38,9 @@ on an isolated machine is given in [OffGrid.md](OffGrid.md).
 ## Making test packages and contributing recipes
 Make your own fork of the repository to work on unstable recipes. Contribute new directories (recipes) for this repository by making a pull request.
 
+## Packaging pre-checks
+Many recipes provide scripts that stage sources and provide precise arguments to package building utilities. Simple checks prior to starting long build processes can help users get the right required packages installed before building OVIS codes. The support/ directory provides shell script function libraries to check common prerequisites. As platforms evolve, some contributions may need to include alternate versions of support/package-functions.rpm.rhel7.
+
 ## Configuring LDMS with systemd and genders support
 Scalable configuration management of clusters is easily done using the libgenders
 options to control the ldmsd systemd service. The TOSS3 builds demonstrate how to
