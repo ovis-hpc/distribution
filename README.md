@@ -3,16 +3,16 @@ Each directory is self-documenting. Recipes that can be used for complete builds
 
 The directories follow a naming convention to aid new users in identifying which example to examine first. The convention is:
 
-	$release-or-branch.$OS.$subtype.\[feature.\]\*.
+	$release-or-branch.$OS.$subtype[.feature]*
 
 for example 
 * OVIS-4.rhel7.base.nopython: builds v4 branch tip without python bindings on Redhat installing to LHS/FSB locations as interpretted by redhat packaging guidelines.
-* OVIS-4.rhel7.base.optanaconda3: builds v4 branch tip with python assuming /opt/anaconda/3 created outside the RPM packaging system.
+* OVIS-4.rhel7.base.opt_anaconda_3: builds v4 branch tip with python assuming /opt/anaconda/3 created outside the RPM packaging system.
 * OVIS-4.rhel7.sc: builds v4 branch tip packaged following Redhat 7 Software Collections guide
 * OVIS-4.u18.base: builds for standard Ubuntu 18 environment (provides example debian/ directory)
 * OVIS-4.CLE7.base: builds v4 branch tip packaged for Cray Linux Environment 7
 
-Notable values of subtype thus far are base, and sc. Use epel as an OS name, since EPEL introduces many packaging incompatibilities via newer versions, or example libssl.
+Notable values of subtype thus far are base, and sc. Use epel as an OS name, since EPEL introduces many packaging incompatibilities via newer versions, for example libssl.
 
 ## Making packages
 
@@ -35,8 +35,13 @@ Most of the packaging examples collected here include a scripted step to downloa
 sources from github. An example of modifying these scripts to work
 on an isolated machine is given in [OffGrid.md](OffGrid.md).
 
+Many sites with Internet access will need to set the https_proxy variable to enable external git repository access. If you see a git clone or curl or wget hung during build, interrupt it and verify https_proxy and http_proxy are set per your site guidelines.
+
 ## Making test packages and contributing recipes
 Make your own fork of the repository to work on unstable recipes. Contribute new directories (recipes) for this repository by making a pull request.
+
+## Packaging pre-checks
+Many recipes provide scripts that stage sources and provide precise arguments to package building utilities. Simple checks prior to starting long build processes can help users get the right required packages installed before building OVIS codes. The support/ directory provides shell script function libraries to check common prerequisites. As platforms evolve, some contributions may need to include alternate versions of support/package-functions.rpm.rhel7.
 
 ## Configuring LDMS with systemd and genders support
 Scalable configuration management of clusters is easily done using the libgenders
@@ -51,8 +56,9 @@ Review the recipes listing python as a feature.
 ## Platform packaging guides
 
 Debian/Ubuntu
-[https://wiki.debian.org/Packaging]
-[https://packaging.ubuntu.com/html/]
+https://wiki.debian.org/Packaging
+https://packaging.ubuntu.com/html/
+
 Software Collections
 https://access.redhat.com/documentation/en-us/red_hat_software_collections/1/html/packaging_guide/index
 https://www.softwarecollections.org/en/docs/
