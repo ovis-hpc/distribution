@@ -1,0 +1,6 @@
+[ovis-local]
+name=OVIS-4 basic build package
+baseurl=file:///home/baallan/odtest/ovis-distribution/ovis-4.toss3.base/ovis-local-repo
+enabled=1
+gpgcheck=0
+protect=1
