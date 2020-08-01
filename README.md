@@ -5,14 +5,16 @@ The directories follow a naming convention to aid new users in identifying which
 
 	$release-or-branch.$OS.$subtype[.feature]*
 
-for example 
-* OVIS-4.rhel7.base.nopython: builds v4 branch tip without python bindings on Redhat installing to LHS/FSB locations as interpretted by redhat packaging guidelines.
-* OVIS-4.rhel7.base.opt_anaconda_3: builds v4 branch tip with python assuming /opt/anaconda/3 created outside the RPM packaging system.
-* OVIS-4.rhel7.sc: builds v4 branch tip packaged following Redhat 7 Software Collections guide
-* OVIS-4.u18.base: builds for standard Ubuntu 18 environment (provides example debian/ directory)
-* OVIS-4.CLE7.base: builds v4 branch tip packaged for Cray Linux Environment 7
+for example (not all examples are published yet):
+* OVIS-4.rhel7.base: builds v4 branch tip on Redhat installing to FHS locations as interpretted by redhat packaging guidelines.
+* v3.4.13.toss3.base.mofed.rabbitmq: build v3.4.13 release for toss3 with MOFED and RabbitMQ support.
+* ovis-4.toss3.atse-125.papi.llnllustre.sos: ATSE spec files (only) from an opensuse build service instance enabling everything feasible in TOSS3.
+* OVIS-4.rhel7.sc: (pending) builds v4 branch tip packaged following Redhat 7 Software Collections guide
+* OVIS-4.rhel7.base.opt_anaconda_3: (pending) builds v4 branch tip with cython/python assuming /opt/anaconda/3 installed outside the RPM packaging system.
+* OVIS-4.u18.base: (pending) builds for standard Ubuntu 18 environment (provides example debian/ directory)
+* OVIS-4.CLE7.base: (pending) builds v4 branch tip packaged for Cray Linux Environment 7
 
-Notable values of subtype thus far are base, atse-$VER and sc. Use epel as an OS name, since EPEL introduces many packaging incompatibilities via newer versions, for example libssl.
+If contributing EPEL packaging, Use epel$version as an OS name, since EPEL introduces many packaging incompatibilities via newer versions, for example libssl.
 
 ## Making packages
 
@@ -24,7 +26,7 @@ specific README.md. For example:
 
     git clone git@github.com:ovis-hpc/distribution.git
     cd distribution
-    cd OVIS-4.rhel7.base.nopython
+    cd OVIS-4.rhel7.base
     more README.md
 
 ## Installation
