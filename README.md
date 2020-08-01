@@ -1,5 +1,5 @@
 This repository is a collection of miscellaneous packaging recipes for OVIS software, each in its own directory. These recipes provide complete examples of configuring and building the software in diverse environments.
-Each directory is self-documenting. Recipes that can be used for complete builds are preferred, but recipes extracted from automated bulk packaging services (e.g. Koji or openSUSE Build Service ) are also accepted.
+Each directory is self-documenting. Recipes that can be used for complete builds are preferred, but recipes extracted from automated bulk packaging services (e.g. Koji or openSUSE Build Service ) are also provided for advanced users.
 
 The directories follow a naming convention to aid new users in identifying which example to examine first. The convention is:
 
@@ -12,7 +12,7 @@ for example
 * OVIS-4.u18.base: builds for standard Ubuntu 18 environment (provides example debian/ directory)
 * OVIS-4.CLE7.base: builds v4 branch tip packaged for Cray Linux Environment 7
 
-Notable values of subtype thus far are base, and sc. Use epel as an OS name, since EPEL introduces many packaging incompatibilities via newer versions, for example libssl.
+Notable values of subtype thus far are base, atse-$VER and sc. Use epel as an OS name, since EPEL introduces many packaging incompatibilities via newer versions, for example libssl.
 
 ## Making packages
 
