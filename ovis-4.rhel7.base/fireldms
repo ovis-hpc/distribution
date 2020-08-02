@@ -1,0 +1,197 @@
+#!/bin/bash
+#
+#
+
+# When creating a new build recipe directory, update packing variable matching the dir name.
+# packing=ovis-4-mine.toss3.base
+# The packing variable prevents running this script anywhere but in its own directory.
+packing=ovis-4.rhel7.base
+
+# sos dependency
+sospkg=$(basename $(ls sos/Tars/sosdb-4.3.4*.gz) .tar.gz)
+# set sospkg to empty string if disabling sos in ldms
+# sospkg=""
+
+# each spec file has a corresponding PART. Change the part name if doing a new spec file for other software.
+PART=LDMS
+
+# on network
+OVISREPO=git@github.com:ovis-hpc/ovis.git
+# off network with 'sources' archive
+# OVISREPO=../../ovis
+
+# change OVISREPO and ovis_branch variables if you want to make local patches or
+# test another ovis v4 development branch.
+ovis_branch=OVIS-4
+
+# Load the prescreen functions used with the check_configure_args and save time finding
+# missing dependencies.
+. ../support/package-functions.rpm.rhel7 
+
+if test -n "$sospkg"; then
+	USESOS="--enable-sos"
+	SOS_OPTS="--with-sos=/usr"
+else
+	USESOS="--disable-sos"
+	SOS_OPTS=""
+fi
+
+# The check_configure_args are used in prechecking, making the ldms tar file
+# and in the spec file
+
+prefix=/usr
+PACK_OPTS="
+--disable-static
+--prefix=$prefix
+--with-pkglibdir=ovis-ldms
+"
+DOC_OPTS="
+--enable-doc
+--enable-doc-html
+"
+SECURITY_OPTS="
+--enable-ovis_auth
+--enable-ssl
+"
+NETWORK_OPTS="
+--enable-ovis_event
+--enable-zap
+--enable-sock
+--disable-rdma
+--disable-mmap
+"
+CRAY_LOCATIONS=""
+
+IFACE_OPTS="
+--enable-swig
+--disable-readline
+--enable-ldms-python
+--disable-libgenders
+--enable-genderssystemd
+"
+STORE_OPTS="
+$USESOS
+--enable-flatfile
+--enable-csv
+--enable-store
+--disable-rabbitv3
+--disable-rabbitkw
+"
+SAMPLER_OPTS="
+--disable-cray_power_sampler
+--disable-cray_system_sampler
+--disable-aries-gpcdr
+--disable-gpcdlocal
+--disable-aries-mmr
+--disable-ugni
+--disable-perfevent
+--disable-procdiskstats
+--disable-atasmart
+--disable-generic_sampler
+--disable-switchx
+--enable-dstat
+--enable-llnl-edac
+--disable-sysclassib
+--disable-opa2
+--disable-perf
+--disable-ibnet
+--disable-jobid
+--enable-array_example
+--enable-procinterrupts
+--enable-procnetdev
+--enable-procnfs
+--enable-procstat
+--enable-vmstat
+--enable-meminfo
+--enable-lustre
+--enable-slurmtest
+--enable-filesingle
+"
+check_configure_args="$PACK_OPTS $SECURITY_OPTS $NETWORK_OPTS $IFACE_OPTS $STORE_OPTS $SAMPLER_OPTS $CRAY_LOCATIONS $SOS_OPTS"
+
+if ! pack_prechecks "$check_configure_args"; then
+	echo "Check dependencies listed above, install needed packages, and try again"
+	exit 1
+fi
+
+dn=$(pwd)
+specdir=$dn
+bn=$(basename $dn)
+specfilein=ldms.spec.in
+specfile=ldms.spec
+if test "$bn" = "$packing" -a -f $specfilein; then
+	: in the right place
+else
+	echo This must be run from $packing, which should be clean and at any rate will be overwritten.
+	exit 1
+fi
+
+specdir=$dn
+
+PART=LDMS
+/bin/rm -rf $PART
+if test -d $OVISREPO; then
+	cp -ar $OVISREPO $PART
+else
+	if ! git clone $OVISREPO $PART; then
+		echo cannot checkout ldms.
+		exit 1
+	fi
+fi
+
+cd $PART
+if ! git checkout $ovis_branch; then
+	echo cannot checkout ovis branch $ovis_branch.
+	exit 1
+fi
+cd ..
+
+
+cd $PART
+# patch files in the patches/ directory can be listed here.
+# It is better usually to make a branch in a proper repository, however.
+patches="pdiff sdiff"
+for i in $patches; do
+	git apply ../patches/$i
+	git commit -a -m "add $packing distribution patches: $i"
+done
+# patches that add new files need a little more git assistance.
+# list the new files here
+newfiles=
+if test -n "$newfiles"; then
+	git add $newfiles
+	git commit -a -m "add $packing distribution files: $newfilest"
+fi
+
+./autogen.sh
+./configure $check_configure_args
+make dist
+TARGET=$(ls ovis-ldms-*.gz)
+BASETARGET=$(basename $TARGET .tar.gz)
+ldmssuffix=$(echo $BASETARGET | sed -e 's/ovis-ldms-[0-9]*.[0-9]*.[0-9]*-//')
+ldmsrelease=$(echo 1_${ldmssuffix} | sed -e 's/-/_/')
+version=$(echo $BASETARGET | sed -e 's/ovis-ldms-//' -e "s/-${ldmssuffix}$//")
+
+echo "============================= make $packing rpms =============" && \
+mkdir -p {BUILD,RPMS,SOURCES,SPECS,SRPMS} && \
+cp $TARGET SOURCES/ && \
+rm -f completed && \
+echo "rpmbuild============================"
+./config.status --file=$specdir/$specfile:$specdir/$specfilein && \
+rpmbuild -v \
+ --define "_topdir $(pwd)" \
+ --define "_version $version" \
+ --define "ldmssuffix $ldmssuffix" \
+ --define "ldmsrelease $ldmsrelease" \
+ -ba $specdir/$specfile && \
+touch completed
+if ! test -f completed; then
+	echo FAIL
+else
+	echo PASS
+	# generate the lists of what we built
+	cd $dn
+	./inventory.sh
+	echo the droids you seek may be:
+	find $PART -name '*.rpm'
+fi
