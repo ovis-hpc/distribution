@@ -1,6 +1,6 @@
 #! /bin/bash
 
-PARTS="ovis/Tars/ovis-3.4.13/v3.4.13.toss3.base.mofed.rabbitmq"
+PARTS="SOS LDMS"
 if test -n "$1"; then
 	repo=$1
 else
@@ -21,7 +21,7 @@ else
 fi
 cat << EOF > ovis-local.repo
 [ovis-local]
-name=OVIS-3.4.13 mofed/rabbitmq build package
+name=OVIS-4 basic build package
 baseurl=file://$repo
 enabled=1
 gpgcheck=0
