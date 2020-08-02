@@ -276,7 +276,7 @@ function pack_ck_rdma_cm {
 }
 
 # genders init scripts check
-function pack_ck_genders {
+function pack_ck_libgenders {
 	if test -z "$BOOST_ROOT"; then
 		pack_checkfiles /usr/bin/nodeattr /usr/include/gendersplusplus.hpp /usr/include/boost/program_options.hpp /usr/lib64/libboost_program_options.so /usr/include/boost/regex.hpp /usr/lib64/libboost_regex.so
 		x=$?
@@ -338,9 +338,9 @@ function pack_prechecks {
 		x=$?
 		bad=$(( $bad + $x))
 	fi
-	if echo "$*" | grep enable-genders >/dev/null; then
+	if echo "$*" | grep enable-libgenders >/dev/null; then
 		echo Checking some genders-based init script dependencies
-		pack_ck_genders
+		pack_ck_libgenders
 		x=$?
 		bad=$(( $bad + $x))
 	fi
