@@ -41,7 +41,7 @@ cd /etc/sysconfig/ldms.d/ClusterSecrets
 and note that ldmsauth.conf must start with a valid secretword= line and have permissions 600.
 
 
-# Dependencies:
+# Package Dependencies:
 	gcc
 	rpm-build
 	bison bison-devel
