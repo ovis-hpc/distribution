@@ -16,7 +16,8 @@ sospkg=$(basename $(ls sos/Tars/sosdb-4.3.4*.gz) .tar.gz)
 PART=LDMS
 
 # on network
-OVISREPO=git@github.com:ovis-hpc/ovis.git
+#OVISREPO=git@github.com:ovis-hpc/ovis.git
+OVISREPO=https://github.com/ovis-hpc/ovis.git
 # off network with 'sources' archive
 # OVISREPO=../../ovis
 
