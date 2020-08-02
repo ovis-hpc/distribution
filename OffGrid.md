@@ -34,6 +34,7 @@ Using the release tar or zip files from ovis-hpc/ovis is usually ok starting wit
 Change lines such as
 
 '''
+    SOSREPO=https://github.com/ovis-hpc/sos.git
     OVISREPO=https://github.com/ovis-hpc/ovis.git
 '''
 
@@ -45,6 +46,4 @@ to
 '''
 
 then do the builds as directed by the README.md in your directory.
-
-    ./firerpms
 
