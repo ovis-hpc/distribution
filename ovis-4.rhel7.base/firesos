@@ -4,7 +4,8 @@
 packing=ovis-4.rhel7.base
 sos_branch=SOS-4
 # on network
-SOSREPO=git@github.com:ovis-hpc/sos.git
+#SOSREPO=git@github.com:ovis-hpc/sos.git
+SOSREPO=https://github.com/ovis-hpc/sos.git
 # off network with 'sources' archive
 #SOSREPO=../../sos
 
