@@ -28,7 +28,7 @@ Group: %{ldms_all}
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Source: %{name}-%{version}.tar.gz
 Requires: rpm >= 4.8.0
-BuildRequires: gcc glib2-devel
+BuildRequires: gcc
 @ENABLE_PYTHON_TRUE@Requires: python2
 @ENABLE_PYTHON_TRUE@Requires: python2-devel
 @ENABLE_PYTHON_TRUE@Requires: python2-numpy
