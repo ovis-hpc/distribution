@@ -19,14 +19,15 @@ OVISREPO=https://github.com/ovis-hpc/ovis.git
 # test another ovis v4 development branch.
 ovis_branch=OVIS-4
 
+# Load the prescreen functions used with the check_configure_args and save time finding
+# missing dependencies.
+. ../support/package-functions.rpm.rhel7 
+
 # Clear out hpc modules. They often contain incomplete autotools or unexpected compilers
 if test -n "$MODULEPATH"; then
 	module purge
 fi
 
-# Load the prescreen functions used with the check_configure_args and save time finding
-# missing dependencies.
-. ../support/package-functions.rpm.rhel7
 
 # The check_configure_args are used in prechecking  and in making the ldms tar file (make dist) only.
 # Changes here do not affect ldms.spec; it must be updated separately.
@@ -48,10 +49,17 @@ else
 	exit 1
 fi
 
-/bin/rm -rf LDMS
-if ! git clone $OVISREPO $PART; then
-	echo cannot checkout ovis.
-	exit 1
+specdir=$dn
+
+PART=LDMS
+/bin/rm -rf $PART
+if test -d $OVISREPO; then
+	cp -ar $OVISREPO $PART
+else
+	if ! git clone $OVISREPO $PART; then
+		echo cannot checkout ldms.
+		exit 1
+	fi
 fi
 
 cd $PART
@@ -67,7 +75,6 @@ cd $PART
 # It is better usually to make a branch in a proper repository, however.
 patches=""
 for i in $patches; do
-	# patch -p1 < ../patches/$i
 	git apply ../patches/$i
 	git commit -a -m "add $packing distribution patches: $i"
 done

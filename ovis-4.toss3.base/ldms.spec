@@ -225,7 +225,7 @@ package.
 Summary: LDMS test package
 Group: %{ldms_grp}
 Requires: ovis-ldms = %{version}
-Obsoletes: ovis-test < 4
+Obsoletes: ovis-test < 4 ldms-all-test
 %description test
 This is a collection of test scripts for (LDMS).
 They also serve as examples, but are not usually of direct 
@@ -324,13 +324,11 @@ Doxygen files for ovis package.
 %docdir %{_datadir}/doc
 
 %package python2
-Summary: Python files for LDMS
+Summary: Python2 files for LDMS
 Obsoletes: ovis-python2 < 4
 Group: %{ldms_all}
-# install needs
 Requires: python
 Requires: ovis-ldms = %{version}
-# build needs
 BuildRequires: python
 BuildRequires: python python-devel swig
 %description python2
@@ -339,7 +337,6 @@ Python files for ovis
 %defattr(-,root,root)
 %{_prefix}/lib/python2.7/site-packages/ovis_ldms
 %{_prefix}/lib/python2.7/site-packages/ldmsd
-#%%{python2_sitelib}/*
 #end python2
 # see https://fedoraproject.org/wiki/Packaging:Python_Old
 # and https://fedoraproject.org/wiki/Packaging:Python
