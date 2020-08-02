@@ -33,6 +33,9 @@ specific README.md. For example:
     cd OVIS-4.rhel7.base
     more README.md
 
+### Comparing packages
+Graphical diff/editing tools can compare spec files and launch scripts (fire*) across recipes, making it easy to transfer common improvements among recipes, such as including configure options controlling new features. An example comparing a RHEL 7 spec file input to ldms the config.status filter and a hard-coded TOSS3 spec file is: https://github.com/ovis-hpc/distribution/blob/master/doc/meld-example.png.
+
 ### Installation
 See the README.md in each directory. Package installation varies by platform and use-case.
 
