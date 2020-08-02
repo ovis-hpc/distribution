@@ -88,7 +88,7 @@ SAMPLER_OPTS="
 "
 allconfig="$PACK_OPTS $SECURITY_OPTS $NETWORK_OPTS $IFACE_OPTS $BALER_OPTS $STORE_OPTS $SAMPLER_OPTS $CRAY_LOCATIONS"
 
-if ! pack_prechecks "$allconfig"; then
+if ! pack_prechecks_v3 "$allconfig"; then
 	echo "Check dependencies listed above, install needed packages, and try again"
 	exit 1
 fi

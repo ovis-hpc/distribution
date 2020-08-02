@@ -295,6 +295,89 @@ function pack_ck_libgenders {
 function pack_prechecks {
 	echo Making cheap checks for prerequisites based on configure options.
 	local bad=0
+	pack_ck_glib2
+	x=$?
+	bad=$(( $bad + $x))
+	pack_ck_rpmbuild
+	x=$?
+	bad=$(( $bad + $x))
+	pack_ck_rpath
+	x=$?
+	bad=$(( $bad + $x))
+	if echo "$*" | grep disable-yaml >/dev/null; then
+		:
+	else
+		pack_ck_yaml
+		x=$?
+	fi
+	bad=$(( $bad + $x))
+	if echo "$*" | grep enable-ovis_auth >/dev/null; then
+		echo Checking some ovis_auth dependencies
+		pack_ck_ssl
+		x=$?
+		bad=$(( $bad + $x))
+	fi
+	if echo "$*" | grep enable-ldms-python >/dev/null; then
+		echo Checking some ldms-python scripting dependencies
+		pack_ck_python
+		x=$?
+		bad=$(( $bad + $x))
+	fi
+	if echo "$*" | grep enable-sysclassib >/dev/null; then
+		echo Checking some sysclassib sampler dependencies
+		pack_ck_verbs
+		x=$?
+		bad=$(( $bad + $x))
+	fi
+	if echo "$*" | grep enable-rdma >/dev/null; then
+		echo Checking some rdma transport dependencies
+		pack_ck_rdma_cm
+		x=$?
+		bad=$(( $bad + $x))
+	fi
+	if echo "$*" | grep enable-libgenders >/dev/null; then
+		echo Checking some genders-based init script dependencies
+		pack_ck_libgenders
+		x=$?
+		bad=$(( $bad + $x))
+	fi
+	if echo "$*" | grep enable-swig >/dev/null; then
+		echo Checking some swig dependencies
+		pack_ck_pydev
+		x=$?
+		bad=$(( $bad + $x))
+		pack_ck_swig
+		x=$?
+		bad=$(( $bad + $x))
+	fi
+	if echo "$*" | grep enable-sos >/dev/null; then
+		if echo "$*" | grep enable-python >/dev/null; then
+			echo Checking some sos python ui dependencies
+			pack_ck_cython
+			x=$?
+			bad=$(( $bad + $x))
+			pack_ck_numpy
+			x=$?
+			bad=$(( $bad + $x))
+		fi
+		if echo "$*" | grep with-sos >/dev/null; then
+			echo Checking some for sosdb install
+			pack_ck_sosdb
+			x=$?
+			bad=$(( $bad + $x))
+		fi
+	fi
+	if test "$bad" = "0"; then
+		echo "Looks ok, but configure may still fail for advanced plugins."
+	fi
+	return $bad
+}
+
+# We do these to short circuit wasting make dist and configure time on
+# things that rpm Requires/BuildRequires will ultimately catch.
+function pack_prechecks_v3 {
+	echo Making cheap checks for prerequisites based on configure options.
+	local bad=0
 	pack_ck_event "$*"
 	x=$?
 	bad=$(( $bad + $x))
