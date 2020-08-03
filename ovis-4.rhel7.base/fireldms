@@ -151,7 +151,7 @@ cd ..
 cd $PART
 # patch files in the patches/ directory can be listed here.
 # It is better usually to make a branch in a proper repository, however.
-patches="pdiff sdiff"
+patches=""
 for i in $patches; do
 	git apply ../patches/$i
 	git commit -a -m "add $packing distribution patches: $i"
