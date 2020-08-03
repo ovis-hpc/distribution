@@ -6,17 +6,17 @@ The directories follow a naming convention to aid new users in identifying which
 	$release-or-branch.$OS.$subtype[.feature]*
 
 for example:
-* OVIS-4.rhel7.base: builds v4 branch tip on Redhat installing to FHS locations as interpretted by redhat packaging guidelines.
+* ovis-4.rhel7.base: builds v4 branch tip on Redhat installing to FHS locations as interpretted by redhat packaging guidelines.
 * v3.4.13.toss3.base.mofed.rabbitmq: build v3.4.13 release for toss3 with MOFED and RabbitMQ support. Produces relocatable rpms.
 * ovis-4.toss3.atse-125.papi.llnllustre.sos: ATSE spec files (only) from an opensuse build service instance enabling everything feasible in TOSS3.
 
 ### Packaging development plan
 The following packagings are planned to be created or ported soon from other projects. If you need a recipe you do not see here, please open an issue about it.
-* OVIS-4.rhel7.sc: builds v4 branch tip packaged following Redhat 7 Software Collections guide for installing in /opt.
-* OVIS-4.rhel7.base.opt_anaconda_3: builds v4 branch tip with cython/python assuming /opt/anaconda/3 installed outside the RPM packaging system.
-* OVIS-4.u18.base:  builds for standard Ubuntu 18 environment (provides example debian/ directory)
-* OVIS-4.CLE7.base:  builds v4 branch tip packaged for Cray Linux Environment 7
-* OVIS-4.CLE6.base:  builds v4 branch tip packaged for Cray Linux Environment 7.
+* ovis-4.rhel7.sc: builds v4 branch tip packaged following Redhat 7 Software Collections guide for installing in /opt.
+* ovis-4.rhel7.base.opt_anaconda_3: builds v4 branch tip with cython/python assuming /opt/anaconda/3 installed outside the RPM packaging system.
+* ovis-4.u18.base:  builds for standard Ubuntu 18 environment (provides example debian/ directory)
+* ovis-4.cle7.base:  builds v4 branch tip packaged for Cray Linux Environment 7
+* ovis-4.cle6.base:  builds v4 branch tip packaged for Cray Linux Environment 7.
 
 If contributing EPEL packaging, Use epel$version as an OS name, since EPEL introduces many packaging incompatibilities via newer versions, for example libssl.
 
@@ -30,7 +30,7 @@ specific README.md. For example:
 
     git clone git@github.com:ovis-hpc/distribution.git
     cd distribution
-    cd OVIS-4.rhel7.base
+    cd ovis-4.rhel7.base
     more README.md
 
 ### Comparing packages
