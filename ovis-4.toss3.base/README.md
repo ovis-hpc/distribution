@@ -10,11 +10,11 @@ To Build it all:
 
 Install the dependencies listed at the end, then:
 
-./fireovis
+    ./fireovis
 
-./fireldms
+    ./fireldms
 
-./rootmakerepo
+    ./rootmakerepo
 
 ### Installation:
 
