@@ -20,7 +20,7 @@ The following packagings are planned to be created or ported soon from other pro
 
 If contributing EPEL packaging, Use epel$version as an OS name, since EPEL introduces many packaging incompatibilities via newer versions, for example libssl.
 
-LLNL does things its own way: https://github.com/LLNL/ovis/releases, see the spec files.
+LLNL does things its own way and shares it: https://github.com/LLNL/ovis/releases, see the spec files. https://github.com/LLNL/ovis/tree/OVIS-4.3.3-toss/rpm
 
 ### Making packages
 
