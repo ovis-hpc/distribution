@@ -11,18 +11,11 @@ To Build it all:
 Install the dependencies listed at the end, then:
 
 ./firesos
-
+./root-makerepo
+sudo rpm -Uvh ovis-local.repo/sosdb*.x86_64.rpm
 ./fireldms
-
 ./rootmakerepo
-
-# Installation:
-
-To get started, just use (assuming an x86_64 host):
-
-```
-rpm -Uvh ovis-local.repo/*.x86_64.rpm
-```
+sudo rpm -Uvh ovis-local.repo/ovis*.x86_64.rpm
 
 # Running hints (configuration of ldmsd and use of systemd is covered elsewhere)
 Then to get the daemon running, you will need to (per your site tastes) fix the authentication 
