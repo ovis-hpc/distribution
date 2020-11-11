@@ -23,7 +23,10 @@ OVISREPO=https://github.com/ovis-hpc/ovis.git
 
 # change OVISREPO and ovis_branch variables if you want to make local patches or
 # test another ovis v4 development branch.
-ovis_branch=OVIS-4
+# the release
+ovis_branch=OVIS-4.3.4
+# the latest
+#ovis_branch=OVIS-4
 
 # Load the prescreen functions used with the check_configure_args and save time finding
 # missing dependencies.
@@ -66,7 +69,8 @@ CRAY_LOCATIONS=""
 IFACE_OPTS="
 --enable-swig
 --disable-readline
---enable-ldms-python
+--disable-ldms-python
+--disable-python
 --disable-libgenders
 --enable-genderssystemd
 "
@@ -167,11 +171,15 @@ fi
 ./autogen.sh
 ./configure $check_configure_args
 make dist
+set -x
 TARGET=$(ls ovis-ldms-*.gz)
 BASETARGET=$(basename $TARGET .tar.gz)
-ldmssuffix=$(echo $BASETARGET | sed -e 's/ovis-ldms-[0-9]*.[0-9]*.[0-9]*-//')
-ldmsrelease=$(echo 1_${ldmssuffix} | sed -e 's/-/_/')
-version=$(echo $BASETARGET | sed -e 's/ovis-ldms-//' -e "s/-${ldmssuffix}$//")
+# strip name-M.M.P
+ldmssuffix=$(echo $BASETARGET | sed -e 's/ovis-ldms-[0-9]*.[0-9]*.[0-9]*//')
+# make - into _ for release, strip leading .
+ldmsrelease=$(echo ${ldmssuffix} | sed -e 's/-/_/' -e 's/^[.]//')
+# get M.M.P
+version=$(echo $BASETARGET | sed -e 's/ovis-ldms-//' -e "s/${ldmssuffix}$//")
 
 echo "============================= make $packing rpms =============" && \
 mkdir -p {BUILD,RPMS,SOURCES,SPECS,SRPMS} && \
