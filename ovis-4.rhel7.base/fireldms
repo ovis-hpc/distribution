@@ -180,6 +180,12 @@ ldmssuffix=$(echo $BASETARGET | sed -e 's/ovis-ldms-[0-9]*.[0-9]*.[0-9]*//')
 ldmsrelease=$(echo ${ldmssuffix} | sed -e 's/-/_/' -e 's/^[.]//')
 # get M.M.P
 version=$(echo $BASETARGET | sed -e 's/ovis-ldms-//' -e "s/${ldmssuffix}$//")
+if test -z "$ldmssuffix"; then
+	ldmssuffix="%{nil}"
+fi
+if test -z "$ldmsrelease"; then
+	ldmsrelease="%{nil}"
+fi
 
 echo "============================= make $packing rpms =============" && \
 mkdir -p {BUILD,RPMS,SOURCES,SPECS,SRPMS} && \

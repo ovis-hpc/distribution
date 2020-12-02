@@ -12,8 +12,8 @@ PART=LDMS
 
 # Place where we will find a repository to clone. may require setting http[s]_proxy in private networks.
 # In an isolated host, a clone pre-copied to a local file system should be used.
-#OVISREPO=/my_repo_clones/github.com/ovis-hpc/ovis.git
-OVISREPO=https://github.com/ovis-hpc/ovis.git
+OVISREPO=../../ovis
+#OVISREPO=https://github.com/ovis-hpc/ovis.git
 
 # change OVISREPO and ovis_branch variables if you want to make local patches or
 # test another ovis v4 development branch.
@@ -94,6 +94,12 @@ BASETARGET=$(basename $TARGET .tar.gz)
 ldmssuffix=$(echo $BASETARGET | sed -e 's/ovis-ldms-[0-9]*.[0-9]*.[0-9]*-//')
 ldmsrelease=$(echo 1_${ldmssuffix} | sed -e 's/-/_/')
 version=$(echo $BASETARGET | sed -e 's/ovis-ldms-//' -e "s/-${ldmssuffix}$//")
+if test -z "$ldmssuffix"; then
+	ldmssuffix="%{nil}"
+fi
+if test -z "$ldmsrelease"; then
+	ldmsrelease="%{nil}"
+fi
 
 echo "============================= make $packing rpms =============" && \
 mkdir -p {BUILD,RPMS,SOURCES,SPECS,SRPMS} && \
