@@ -215,21 +215,21 @@ control file, use of libgenders can be bypassed.
 @ENABLE_TOSS_SYSTEMD_TRUE@#end initscripts-sysv
 
 
-%package doc
-Summary: Documentation files for %{name}
-Group: %{ldms_all}
-Obsoletes: ldms-all-doc ovis-doc < 4
-## Requires: %{name}-devel = %{version}-%{release}
-%description doc
-Doxygen files for ovis package.
-%files doc
-%defattr(-,root,root)
-%{_mandir}/*/*
-%exclude %{_mandir}/man8/ldmsd_controller.8.gz
-%{_datadir}/doc/%{name}-%{version}%{ldmssuffix}
-%exclude %{_datadir}/doc/%{name}-%{version}%{ldmssuffix}/relocation
-%exclude %{_datadir}/doc/ovis-ldms-%{version}%{ldmssuffix}/examples
-%docdir /usr/share/doc
+@ENABLE_DOC_TRUE@%package doc
+@ENABLE_DOC_TRUE@Summary: Documentation files for %{name}
+@ENABLE_DOC_TRUE@Group: %{ldms_all}
+@ENABLE_DOC_TRUE@Obsoletes: ldms-all-doc ovis-doc < 4
+@ENABLE_DOC_TRUE@## Requires: %{name}-devel = %{version}-%{release}
+@ENABLE_DOC_TRUE@%description doc
+@ENABLE_DOC_TRUE@Doxygen files for ovis package.
+@ENABLE_DOC_TRUE@%files doc
+@ENABLE_DOC_TRUE@%defattr(-,root,root)
+@ENABLE_DOC_TRUE@%{_mandir}/*/*
+@ENABLE_DOC_TRUE@%exclude %{_mandir}/man8/ldmsd_controller.8.gz
+@ENABLE_DOC_TRUE@%{_datadir}/doc/%{name}-%{version}%{ldmssuffix}
+@ENABLE_DOC_TRUE@%exclude %{_datadir}/doc/%{name}-%{version}%{ldmssuffix}/relocation
+@ENABLE_DOC_TRUE@%exclude %{_datadir}/doc/ovis-ldms-%{version}%{ldmssuffix}/examples
+@ENABLE_DOC_TRUE@%docdir /usr/share/doc
 
 @ENABLE_PYTHON_TRUE@%package python3
 @ENABLE_PYTHON_TRUE@Summary: Python3 files for LDMS

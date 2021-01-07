@@ -94,7 +94,7 @@ Users who want to use sosdb from C must install this package.
 @ENABLE_DOC_TRUE@Summary: Documentation files for %{name}
 @ENABLE_DOC_TRUE@Group: %{ldms_all}
 @ENABLE_DOC_TRUE@%description doc
-@ENABLE_DOC_TRUE@#Doxygen files for ovis sosdb package.
+@ENABLE_DOC_TRUE@Doxygen files for ovis sosdb package.
 @ENABLE_DOC_TRUE@%files doc
 @ENABLE_DOC_TRUE@%defattr(-,root,root)
 @ENABLE_DOC_TRUE@%{_mandir}/*/*
