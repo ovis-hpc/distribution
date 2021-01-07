@@ -1,0 +1,269 @@
+# Set topdir to be builddir/rpm
+# note this is intentionally ignored by rpmbuild. must use
+# commandline syntax in makefile.am to get this effect.
+#% define _topdir %(echo $PWD)/toss
+# do not set unfascist build
+#%-define _unpackaged_files_terminate_build 0
+#%-define _missing_doc_files_terminate_build 0
+
+%define ldms_all System Environment/Libraries
+%define build_timestamp %(date +"%Y%m%d_%H%M")
+# % global __strip /bin/true
+%global _enable_debug_package 0
+%global _enable_debug_packages 0
+%global debug_package %{nil}
+%global __debug_install_post /bin/true
+%global __os_install_post /usr/lib/rpm/brp-compress %{nil}
+%if 0%{?rhel} && 0%{?rhel} <= 6
+%{!?python3_sitelib: %global python3_sitelib %(%{__python3} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
+%{!?python3_sitearch: %global python3_sitearch %(%{__python3} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")}
+%endif
+
+# Main package
+Summary: OVIS Commands and Libraries
+Name: ovis-ldms
+Version: %{_version}
+Release: %{ldmsrelease}%{?dist}
+License: GPLv2 or BSD
+Group: %{ldms_all}
+BuildRoot: %{_tmppath}/%{name}-%{version}%{release}-root-%(%{__id_u} -n)
+Source: ovis-ldms-%{version}%{ldmssuffix}.tar.gz
+Obsoletes: ovis < 4 ldms-all
+Requires: rpm >= 4.8.0
+@ENABLE_SOS_TRUE@Requires: sosdb >= 4.3 
+@ENABLE_SOS_TRUE@BuildRequires: sosdb-devel
+@ENABLE_PYTHON_TRUE@Requires: python3 python3-devel
+@ENABLE_SSL_TRUE@Requires: openssl
+#@ENABLE_LIBGENDERS_TRUE@Requires: boost-regex boost-program-options
+@ENABLE_LIBGENDERS_TRUE@Requires: genders
+BuildRequires: gettext-devel gcc glib2-devel
+@ENABLE_DOC_TRUE@BuildRequires: doxygen
+@ENABLE_OVIS_AUTH_TRUE@BuildRequires: openssl-devel
+@ENABLE_SYSCLASSIB_TRUE@BuildRequires: libibverbs-devel
+@ENABLE_RDMA_TRUE@BuildRequires: librdmacm-devel
+@ENABLE_LIBGENDERS_TRUE@BuildRequires: boost-devel
+@ENABLE_LIBGENDERS_TRUE@BuildRequires: genders
+@ENABLE_KOKKOS_TRUE@@ENABLE_SOS_TRUE@Requires: python3-numpy
+@ENABLE_KOKKOS_TRUE@BuildRequires: bison bison-devel flex flex-devel, libevent >= 2.0.21
+@ENABLE_RABBITKW_TRUE@BuildRequires: librabbitmq librabbitmq-devel
+Url: http://ovis.ca.sandia.gov/
+
+%description
+This package provides the OVIS commands and libraries, OVIS apis and transport libraries, and scalable object store libraries for TOSS 3.
+
+%prep
+%setup -q -n %{name}-%{version}%{ldmssuffix}
+
+%build
+echo bTMPPATH %{_tmppath}
+rm -rf $RPM_BUILD_ROOT
+echo bBUILDROOT $RPM_BUILD_ROOT
+export CFLAGS="@CFLAGS@ %{optflags} -O1 -g"
+%configure @ac_configure_args@
+
+ncores=`grep -c ^processor /proc/cpuinfo`
+make V=1 -j $ncores
+
+%install
+echo TMPPATH %{_tmppath}
+echo BUILDROOT $RPM_BUILD_ROOT
+make DESTDIR=${RPM_BUILD_ROOT} V=1 install
+
+# grunge for no-devel restriction in some environments
+@ENABLE_RABBITKW_TRUE@if test -f $RPM_BUILD_ROOT%{_libdir}/ovis-ldms/libstore_rabbitkw.so -o -f $RPM_BUILD_ROOT%{_libdir}/ovis-ldms/libstore_rabbitv3.so; then
+@ENABLE_RABBITKW_TRUE@	(cd $RPM_BUILD_ROOT%{_libdir}/ovis-ldms/; ln -s /usr/lib64/librabbitmq.so.4 librabbitmq.so; ln -s /usr/lib64/librabbitmq.so.4 .; ln -s /usr/lib64/librabbitmq.so.4.2.0 . )
+@ENABLE_RABBITKW_TRUE@fi
+# remove unpackaged files from the buildroot
+rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
+rm -f $RPM_BUILD_ROOT%{_libdir}/ovis-ldms/lib*.la
+rm $RPM_BUILD_ROOT%{_bindir}/ldms_ban.sh
+rm $RPM_BUILD_ROOT%{_bindir}/ldmsd-wrapper.sh
+find $RPM_BUILD_ROOT%{_docdir}/ovis-ldms-%{version}%{ldmssuffix} -maxdepth 1 -type f -exec mv {} $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/ \;
+@ENABLE_TOSS_SYSTEMD_TRUE@mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/init.d
+@ENABLE_TOSS_SYSTEMD_TRUE@mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/systemd/system
+@ENABLE_TOSS_SYSTEMD_TRUE@cp $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}%{ldmssuffix}/sample_init_scripts/genders/sysv/etc/init.d/ldms* $RPM_BUILD_ROOT%{_sysconfdir}/init.d/
+@ENABLE_TOSS_SYSTEMD_TRUE@cp -ar $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}%{ldmssuffix}/sample_init_scripts/genders/systemd/etc/* $RPM_BUILD_ROOT%{_sysconfdir}
+@ENABLE_TOSS_SYSTEMD_TRUE@cp -r $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}%{ldmssuffix}/sample_init_scripts/genders/systemd/services/ldms*.service $RPM_BUILD_ROOT%{_prefix}/lib/systemd/system
+mkdir -p -m 755 $RPM_BUILD_ROOT%{_localstatedir}/log/ldmsd
+mkdir -p -m 755 $RPM_BUILD_ROOT%{_localstatedir}/run/ldmsd
+mkdir -p -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/ldms.d/ClusterGenders
+mkdir -p -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/ldms.d/ClusterSecrets
+mkdir -p -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/ldms.d/plugins-conf
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(-,root,root)
+%{_libdir}/*
+%{_bindir}/*
+%{_sbindir}/*
+%{_sbindir}/.ldms*
+%{_datadir}/doc/%{name}-%{version}%{ldmssuffix}/relocation
+%{_docdir}/%{name}-%{version}%{ldmssuffix}/COPYING
+#%{_docdir}/%{name}-%{version}%{ldmssuffix}/ChangeLog
+%{_docdir}/%{name}-%{version}%{ldmssuffix}/AUTHORS
+%exclude %{_bindir}/ldms-py*sh
+%exclude %{_bindir}/ldms-meminfo.sh
+%exclude %{_bindir}/ldms-static-test.sh
+%exclude %{_bindir}/ldmsd-pre-systemd
+@ENABLE_PYTHON_TRUE@%exclude %{_bindir}/ldmsd_controller
+%exclude %{_bindir}/ldmsd-pre-sysvinit
+
+@ENABLE_SOS_TRUE@%exclude %{_libdir}/ovis-ldms/libstore_sos*
+@ENABLE_SOS_TRUE@%exclude %{_sbindir}/ldmsd_sos_init
+#end core
+
+# devel
+%package devel
+Summary: LDMS devel package
+Group: %{ldms_grp}
+Requires: ovis-ldms = %{version}
+Obsoletes: ovis-devel ldms-all-devel
+%description devel
+This is a development package of Lightweight Distributed Metric System (LDMS).
+Users who want to implement their own sampler or store must install this
+package.
+
+%files devel
+%defattr(-,root,root)
+%{_includedir}/*/*.h
+%{_includedir}/*/*/*.h
+%{_includedir}/ovis-ldms-config.h
+#end devel
+
+%package test
+Summary: LDMS test package
+Group: %{ldms_grp}
+Requires: ovis-ldms = %{version}
+Obsoletes: ovis-test < 4 ldms-all-test
+%description test
+This is a collection of test scripts for (LDMS).
+They also serve as examples, but are not usually of direct 
+interest on compute nodes in production clusters.
+
+%files test
+%defattr(-,root,root)
+%{_bindir}/ldms-py*sh
+%{_bindir}/ldms-meminfo.sh
+%{_bindir}/ldms-static-test.sh
+%{_datadir}/doc/ovis-ldms-%{version}%{ldmssuffix}/examples/static-test
+%{_datadir}/doc/ovis-ldms-%{version}%{ldmssuffix}/examples/slurm-test
+#end test
+
+# initscripts
+%package initscripts-base
+Summary: LDMS base initscripts for libgenders control of %{name}
+Group: %{ldms_grp}
+Requires: ovis-ldms = %{version}
+Obsoletes: ovis-initscripts-base < 4 ldms-all-initscripts
+%description initscripts-base
+This is the support file set for libgenders based booting of LDMS daemons.
+Users normally provide information via /etc/genders (or alternate file)
+to make these scripts operate. With a manually written daemon
+control file, use of libgenders can be bypassed.
+
+%files initscripts-base
+%defattr(-,root,root)
+@ENABLE_TOSS_SYSTEMD_TRUE@%{_sysconfdir}/sysconfig/ldms.d/README
+@ENABLE_TOSS_SYSTEMD_TRUE@%{_sysconfdir}/sysconfig/ldms.d/ldmsd
+@ENABLE_TOSS_SYSTEMD_TRUE@%{_sysconfdir}/sysconfig/ldms.d/ldmsd.all_instances.conf.example
+@ENABLE_TOSS_SYSTEMD_TRUE@%{_sysconfdir}/sysconfig/ldms.d/ldms-functions
+@ENABLE_TOSS_SYSTEMD_TRUE@%{_sysconfdir}/sysconfig/ldms.d/ClusterGenders/README
+@ENABLE_TOSS_SYSTEMD_TRUE@%{_sysconfdir}/sysconfig/ldms.d/plugins-conf/*
+@ENABLE_TOSS_SYSTEMD_TRUE@%{_sysconfdir}/sysconfig/ldms.d/ClusterSecrets/README
+@ENABLE_TOSS_SYSTEMD_TRUE@%config(noreplace) %{_sysconfdir}/sysconfig/ldms.d/ClusterSecrets/ldmsauth.conf
+@ENABLE_TOSS_SYSTEMD_TRUE@%config(noreplace) %{_sysconfdir}/sysconfig/ldms.d/debug/ldmsd.extra.local.conf
+@ENABLE_TOSS_SYSTEMD_TRUE@%config(noreplace) %{_sysconfdir}/sysconfig/ldms.d/ldmsd.local.conf
+@ENABLE_TOSS_SYSTEMD_TRUE@%config(noreplace) %{_sysconfdir}/sysconfig/ldms.d/ldmsd.agg.conf
+@ENABLE_TOSS_SYSTEMD_TRUE@%config(noreplace) %{_sysconfdir}/sysconfig/ldms.d/ClusterGenders/genders.local
+@ENABLE_TOSS_SYSTEMD_TRUE@%config(noreplace) %{_sysconfdir}/sysconfig/ldms.d/ClusterGenders/genders.agg
+
+#end initscripts-base
+
+@ENABLE_TOSS_SYSTEMD_TRUE@%package initscripts-systemd
+@ENABLE_TOSS_SYSTEMD_TRUE@Summary: LDMS systemd scripts for libgenders control of %{name}
+@ENABLE_TOSS_SYSTEMD_TRUE@Group: %{ldms_grp}
+@ENABLE_TOSS_SYSTEMD_TRUE@Requires: ovis-ldms = %{version} ovis-ldms-initscripts-base = %{version}
+@ENABLE_TOSS_SYSTEMD_TRUE@Obsoletes: ovis-initscripts-systemd < 4
+@ENABLE_TOSS_SYSTEMD_TRUE@%description initscripts-systemd
+@ENABLE_TOSS_SYSTEMD_TRUE@This is the libgenders based systemd scripts for LDMS daemons.
+@ENABLE_TOSS_SYSTEMD_TRUE@Users normally provide information via /etc/genders (or alternate file)
+@ENABLE_TOSS_SYSTEMD_TRUE@to make these scripts operate. They are required to fail out of the box.
+@ENABLE_TOSS_SYSTEMD_TRUE@
+@ENABLE_TOSS_SYSTEMD_TRUE@%files initscripts-systemd
+@ENABLE_TOSS_SYSTEMD_TRUE@%defattr(-,root,root)
+@ENABLE_TOSS_SYSTEMD_TRUE@%config %{_prefix}/lib/systemd/system/ldmsd*.service
+@ENABLE_TOSS_SYSTEMD_TRUE@%config %{_bindir}/ldmsd-pre-systemd
+@ENABLE_TOSS_SYSTEMD_TRUE@#end initscripts-systemd
+
+@ENABLE_TOSS_SYSTEMD_TRUE@# initscripts-sysv
+@ENABLE_TOSS_SYSTEMD_TRUE@%package initscripts-sysv
+@ENABLE_TOSS_SYSTEMD_TRUE@Summary: LDMS sysv init scripts for libgenders control of %{name}
+@ENABLE_TOSS_SYSTEMD_TRUE@Group: %{ldms_grp}
+@ENABLE_TOSS_SYSTEMD_TRUE@Requires: ovis-ldms = %{version} ovis-ldms-initscripts-base = %{version}
+@ENABLE_TOSS_SYSTEMD_TRUE@Obsoletes: ovis-initscripts-sysv < 4
+@ENABLE_TOSS_SYSTEMD_TRUE@%description initscripts-sysv
+@ENABLE_TOSS_SYSTEMD_TRUE@This is the libgenders based sysv init scripts for LDMS daemons.
+@ENABLE_TOSS_SYSTEMD_TRUE@Users must provide information via /etc/genders (or alternate file)
+@ENABLE_TOSS_SYSTEMD_TRUE@to make these scripts operate. They are required to fail out of the box.
+
+@ENABLE_TOSS_SYSTEMD_TRUE@%files initscripts-sysv
+@ENABLE_TOSS_SYSTEMD_TRUE@%defattr(-,root,root)
+@ENABLE_TOSS_SYSTEMD_TRUE@%config %{_sysconfdir}/init.d/ldms*
+@ENABLE_TOSS_SYSTEMD_TRUE@%config %{_bindir}/ldmsd-pre-sysvinit
+@ENABLE_TOSS_SYSTEMD_TRUE@#end initscripts-sysv
+
+
+%package doc
+Summary: Documentation files for %{name}
+Group: %{ldms_all}
+Obsoletes: ldms-all-doc ovis-doc < 4
+## Requires: %{name}-devel = %{version}-%{release}
+%description doc
+Doxygen files for ovis package.
+%files doc
+%defattr(-,root,root)
+%{_mandir}/*/*
+%exclude %{_mandir}/man8/ldmsd_controller.8.gz
+%{_datadir}/doc/%{name}-%{version}%{ldmssuffix}
+%exclude %{_datadir}/doc/%{name}-%{version}%{ldmssuffix}/relocation
+%exclude %{_datadir}/doc/ovis-ldms-%{version}%{ldmssuffix}/examples
+%docdir /usr/share/doc
+
+@ENABLE_PYTHON_TRUE@%package python3
+@ENABLE_PYTHON_TRUE@Summary: Python3 files for LDMS
+@ENABLE_PYTHON_TRUE@Obsoletes: ovis-python2 
+@ENABLE_PYTHON_TRUE@Group: %{ldms_all}
+@ENABLE_PYTHON_TRUE@Requires: python
+@ENABLE_PYTHON_TRUE@Requires: ovis-ldms = %{version}
+@ENABLE_PYTHON_TRUE@BuildRequires: python
+@ENABLE_PYTHON_TRUE@BuildRequires: python python-devel
+@ENABLE_PYTHON_TRUE@BuildRequires: Cython >= 0.25
+@ENABLE_PYTHON_TRUE@%description python3
+@ENABLE_PYTHON_TRUE@Python files for ovis
+@ENABLE_PYTHON_TRUE@%files python3
+@ENABLE_PYTHON_TRUE@%defattr(-,root,root)
+@ENABLE_PYTHON_TRUE@%{_prefix}/lib/python3/site-packages/ovis_ldms
+@ENABLE_PYTHON_TRUE@%{_prefix}/lib/python3/site-packages/ldmsd
+@ENABLE_PYTHON_TRUE@%{_bindir}/ldmsd_controller
+@ENABLE_PYTHON_TRUE@%{_mandir}/man8/ldmsd_controller.8.gz
+@ENABLE_PYTHON_TRUE@#end python3
+# see https://fedoraproject.org/wiki/Packaging:Python_Old
+# and https://fedoraproject.org/wiki/Packaging:Python
+
+@ENABLE_SOS_TRUE@%package ldms-sos
+@ENABLE_SOS_TRUE@Summary: LDMS sosdb plugins
+@ENABLE_SOS_TRUE@Requires: sosdb
+@ENABLE_SOS_TRUE@%description ldms-sos
+@ENABLE_SOS_TRUE@Libraries and utilities for SOS usage in LDMS
+@ENABLE_SOS_TRUE@%files ldms-sos
+@ENABLE_SOS_TRUE@%defattr(-,root,root)
+@ENABLE_SOS_TRUE@%{_sbindir}/ldmsd_sos_init
+@ENABLE_SOS_TRUE@%{_libdir}/ovis-ldms/libstore_sos*
+@ENABLE_SOS_TRUE@#end ldms-sos
+
+
+%changelog
+* Sat Aug 1 2020 Ben Allan <baallan@sandia.gov> 4.3.4-1
+Create nonrelocatable package.

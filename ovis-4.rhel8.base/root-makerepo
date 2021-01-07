@@ -1,0 +1,31 @@
+#! /bin/bash
+
+PARTS="SOS LDMS"
+if test -n "$1"; then
+	repo=$1
+else
+	repo=$(pwd)/ovis-local.repo
+	echo "assuming repo $repo.  If you want,"
+	echo "give an alternate full path to use; if existing it will be destroyed and recreated."
+fi
+rm -rf $repo
+mkdir -p $repo
+find $PARTS -name '*.rpm' -exec cp {} $repo \;
+createrepo -q $repo
+if test "x$UID" = x0; then
+	chown -R root.root $repo
+	chmod go-w -R $repo
+else
+	echo "You are not root."
+	echo "The directory $repo may not work with yum until you run this with root privilege."
+fi
+cat << EOF > ovis-local.repo
+[ovis-local]
+name=OVIS-4 basic build package
+baseurl=file://$repo
+enabled=1
+gpgcheck=0
+protect=1
+EOF
+echo "To install with yum, copy ovis-local.repo to /etc/yum.repos.d/."
+echo "To install with rpm manually, use the files in $repo"
