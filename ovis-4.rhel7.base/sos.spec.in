@@ -90,16 +90,16 @@ Users who want to use sosdb from C must install this package.
 %{_includedir}/*/*.h
 #end devel
 
-%package doc
-Summary: Documentation files for %{name}
-Group: %{ldms_all}
-%description doc
-Doxygen files for ovis sosdb package.
-%files doc
-%defattr(-,root,root)
-%{_mandir}/*/*
-%{_datadir}/doc/%{name}
-%docdir /usr/share/doc
+@ENABLE_DOC_TRUE@%package doc
+@ENABLE_DOC_TRUE@Summary: Documentation files for %{name}
+@ENABLE_DOC_TRUE@Group: %{ldms_all}
+@ENABLE_DOC_TRUE@%description doc
+@ENABLE_DOC_TRUE@Doxygen files for ovis sosdb package.
+@ENABLE_DOC_TRUE@%files doc
+@ENABLE_DOC_TRUE@%defattr(-,root,root)
+@ENABLE_DOC_TRUE@%{_mandir}/*/*
+@ENABLE_DOC_TRUE@%{_datadir}/doc/%{name}
+@ENABLE_DOC_TRUE@%docdir /usr/share/doc
 
 @ENABLE_PYTHON_TRUE@%package python2
 @ENABLE_PYTHON_TRUE@Summary: Python files for SOS DB
