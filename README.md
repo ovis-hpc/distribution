@@ -16,7 +16,7 @@ The following packagings are planned to be created or ported soon from other pro
 * ovis-4.rhel7.base.opt_anaconda_3: builds v4 branch tip with cython/python assuming /opt/anaconda/3 installed outside the RPM packaging system.
 * ovis-4.u18.base:  builds for standard Ubuntu 18 environment (provides example debian/ directory)
 * ovis-4.cle7.base:  builds v4 branch tip packaged for Cray Linux Environment 7
-* ovis-4.cle6.base:  builds v4 branch tip packaged for Cray Linux Environment 7.
+* ovis-4.cle6.base:  builds v4 branch tip packaged for Cray Linux Environment 6.
 
 If contributing EPEL packaging, Use epel$version as an OS name, since EPEL introduces many packaging incompatibilities via newer versions, for example libssl.
 
