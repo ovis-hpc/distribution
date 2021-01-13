@@ -32,7 +32,8 @@ Obsoletes: ovis < 4 ldms-all
 Requires: rpm >= 4.8.0
 @ENABLE_SOS_TRUE@Requires: sosdb >= 4.3 
 @ENABLE_SOS_TRUE@BuildRequires: sosdb-devel
-@ENABLE_PYTHON_TRUE@Requires: python3 python3-devel
+#@ENABLE_PYTHON_TRUE@Requires: python3 python3-devel
+@ENABLE_PYTHON_TRUE@Requires: platform-python platform-python-devel
 @ENABLE_SSL_TRUE@Requires: openssl
 #@ENABLE_LIBGENDERS_TRUE@Requires: boost-regex boost-program-options
 @ENABLE_LIBGENDERS_TRUE@Requires: genders
@@ -235,9 +236,9 @@ control file, use of libgenders can be bypassed.
 @ENABLE_PYTHON_TRUE@Summary: Python3 files for LDMS
 @ENABLE_PYTHON_TRUE@Obsoletes: ovis-python2 
 @ENABLE_PYTHON_TRUE@Group: %{ldms_all}
-@ENABLE_PYTHON_TRUE@Requires: python
+@ENABLE_PYTHON_TRUE@Requires: python3.8
 @ENABLE_PYTHON_TRUE@Requires: ovis-ldms = %{version}
-@ENABLE_PYTHON_TRUE@BuildRequires: python
+@ENABLE_PYTHON_TRUE@BuildRequires: python3.8
 @ENABLE_PYTHON_TRUE@BuildRequires: python python-devel
 @ENABLE_PYTHON_TRUE@BuildRequires: Cython >= 0.25
 @ENABLE_PYTHON_TRUE@%description python3

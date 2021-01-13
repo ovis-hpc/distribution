@@ -8,7 +8,7 @@
 packing=ovis-4.rhel8.base
 
 # sos dependency
-sospkg=$(basename $(ls sos/Tars/sosdb-4.3.4*.gz) .tar.gz)
+sospkg=$(basename $(ls SOS/Tars/sosdb-4.3.4*.gz) .tar.gz)
 # set sospkg to empty string if disabling sos in ldms
 # sospkg=""
 
@@ -24,13 +24,13 @@ OVISREPO=https://github.com/ovis-hpc/ovis.git
 # change OVISREPO and ovis_branch variables if you want to make local patches or
 # test another ovis v4 development branch.
 # the release
-ovis_branch=OVIS-4.3.4
+#ovis_branch=OVIS-4.3.4
 # the latest
-#ovis_branch=OVIS-4
+ovis_branch=OVIS-4
 
 # Load the prescreen functions used with the check_configure_args and save time finding
 # missing dependencies.
-. ../support/package-functions.rpm.rhel7 
+. ../support/package-functions.rpm.rhel8
 
 if test -n "$sospkg"; then
 	USESOS="--enable-sos"
@@ -69,8 +69,8 @@ CRAY_LOCATIONS=""
 IFACE_OPTS="
 --enable-swig
 --disable-readline
---disable-ldms-python
---disable-python
+--enable-ldms-python
+--enable-python
 --disable-libgenders
 --enable-genderssystemd
 "

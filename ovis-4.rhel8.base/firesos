@@ -9,7 +9,7 @@ SOSREPO=https://github.com/ovis-hpc/sos.git
 # off network with 'sources' archive
 #SOSREPO=../../sos
 
-. ../support/package-functions.rpm.rhel7 
+. ../support/package-functions.rpm.rhel8
 
 
 
