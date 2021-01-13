@@ -218,7 +218,7 @@ function pack_ck_sosdb {
 
 # cython check
 function pack_ck_cython {
-	q=$(cython-3.8 -V 2>&1 | grep "Cython version " | sed -e 's/Cython version //')
+	q=$(cython -V 2>&1 | grep "Cython version " | sed -e 's/Cython version //')
 	case $q in
         0.3[0-9].*)
 		echo "letting cython $q through; don't know if it works"

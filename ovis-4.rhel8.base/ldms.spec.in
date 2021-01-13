@@ -216,40 +216,40 @@ control file, use of libgenders can be bypassed.
 @ENABLE_TOSS_SYSTEMD_TRUE@#end initscripts-sysv
 
 
-@ENABLE_DOC_TRUE@%package doc
-@ENABLE_DOC_TRUE@Summary: Documentation files for %{name}
-@ENABLE_DOC_TRUE@Group: %{ldms_all}
-@ENABLE_DOC_TRUE@Obsoletes: ldms-all-doc ovis-doc < 4
-@ENABLE_DOC_TRUE@## Requires: %{name}-devel = %{version}-%{release}
-@ENABLE_DOC_TRUE@%description doc
-@ENABLE_DOC_TRUE@Doxygen files for ovis package.
-@ENABLE_DOC_TRUE@%files doc
-@ENABLE_DOC_TRUE@%defattr(-,root,root)
-@ENABLE_DOC_TRUE@%{_mandir}/*/*
-@ENABLE_DOC_TRUE@%exclude %{_mandir}/man8/ldmsd_controller.8.gz
-@ENABLE_DOC_TRUE@%{_datadir}/doc/%{name}-%{version}%{ldmssuffix}
-@ENABLE_DOC_TRUE@%exclude %{_datadir}/doc/%{name}-%{version}%{ldmssuffix}/relocation
-@ENABLE_DOC_TRUE@%exclude %{_datadir}/doc/ovis-ldms-%{version}%{ldmssuffix}/examples
-@ENABLE_DOC_TRUE@%docdir /usr/share/doc
+%package doc
+Summary: Documentation files for %{name}
+Group: %{ldms_all}
+Obsoletes: ldms-all-doc ovis-doc < 4
+## Requires: %{name}-devel = %{version}-%{release}
+%description doc
+Doxygen files for ovis package.
+%files doc
+%defattr(-,root,root)
+%{_mandir}/*/*
+%exclude %{_mandir}/man8/ldmsd_controller.8.gz
+%{_datadir}/doc/%{name}-%{version}%{ldmssuffix}
+%exclude %{_datadir}/doc/%{name}-%{version}%{ldmssuffix}/relocation
+%exclude %{_datadir}/doc/ovis-ldms-%{version}%{ldmssuffix}/examples
+%docdir /usr/share/doc
 
-@ENABLE_PYTHON_TRUE@%package python3
+@ENABLE_PYTHON_TRUE@%package python3.6
 @ENABLE_PYTHON_TRUE@Summary: Python3 files for LDMS
 @ENABLE_PYTHON_TRUE@Obsoletes: ovis-python2 
 @ENABLE_PYTHON_TRUE@Group: %{ldms_all}
-@ENABLE_PYTHON_TRUE@Requires: python3.8
+@ENABLE_PYTHON_TRUE@Requires: platform-python
 @ENABLE_PYTHON_TRUE@Requires: ovis-ldms = %{version}
-@ENABLE_PYTHON_TRUE@BuildRequires: python3.8
-@ENABLE_PYTHON_TRUE@BuildRequires: python python-devel
-@ENABLE_PYTHON_TRUE@BuildRequires: Cython >= 0.25
-@ENABLE_PYTHON_TRUE@%description python3
+#@ENABLE_PYTHON_TRUE@BuildRequires: python3.6
+@ENABLE_PYTHON_TRUE@BuildRequires: platform-python platform-python-devel
+#@ENABLE_PYTHON_TRUE@BuildRequires: Cython >= 0.25
+@ENABLE_PYTHON_TRUE@%description python3.6
 @ENABLE_PYTHON_TRUE@Python files for ovis
-@ENABLE_PYTHON_TRUE@%files python3
+@ENABLE_PYTHON_TRUE@%files python3.6
 @ENABLE_PYTHON_TRUE@%defattr(-,root,root)
-@ENABLE_PYTHON_TRUE@%{_prefix}/lib/python3/site-packages/ovis_ldms
-@ENABLE_PYTHON_TRUE@%{_prefix}/lib/python3/site-packages/ldmsd
+@ENABLE_PYTHON_TRUE@%{_prefix}/lib/python3.6/site-packages/ovis_ldms
+@ENABLE_PYTHON_TRUE@%{_prefix}/lib/python3.6/site-packages/ldmsd
 @ENABLE_PYTHON_TRUE@%{_bindir}/ldmsd_controller
 @ENABLE_PYTHON_TRUE@%{_mandir}/man8/ldmsd_controller.8.gz
-@ENABLE_PYTHON_TRUE@#end python3
+@ENABLE_PYTHON_TRUE@#end python3.6
 # see https://fedoraproject.org/wiki/Packaging:Python_Old
 # and https://fedoraproject.org/wiki/Packaging:Python
 
@@ -266,5 +266,7 @@ control file, use of libgenders can be bypassed.
 
 
 %changelog
+* Wed Jan 13 2021 Ben Schwaller <bschwal@sandia.gov> 4.3.5-1
+Adapt to RHEL8
 * Sat Aug 1 2020 Ben Allan <baallan@sandia.gov> 4.3.4-1
 Create nonrelocatable package.
