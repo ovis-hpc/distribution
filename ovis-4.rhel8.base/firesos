@@ -26,7 +26,7 @@ DOC_OPTS="
 "
 
 IFACE_OPTS="
---disable-python
+--enable-python
 "
 
 allconfig="$PACK_OPTS $IFACE_OPTS $DOC_OPTS"
