@@ -1,6 +1,9 @@
 #!/bin/bash
 #
 #
+if test -f ../support/proxy_settings; then
+	. ../support/proxy_settings
+fi
 
 # When creating a new build recipe directory, update packing variable matching the dir name.
 # packing=ovis-4-mine.toss3.base
@@ -12,12 +15,12 @@ PART=LDMS
 
 # Place where we will find a repository to clone. may require setting http[s]_proxy in private networks.
 # In an isolated host, a clone pre-copied to a local file system should be used.
-OVISREPO=../../ovis
-#OVISREPO=https://github.com/ovis-hpc/ovis.git
+#OVISREPO=../../ovis
+OVISREPO=https://github.com/ovis-hpc/ovis.git
 
 # change OVISREPO and ovis_branch variables if you want to make local patches or
 # test another ovis v4 development branch.
-ovis_branch=OVIS-4
+ovis_branch=OVIS-4.3.6
 
 # Load the prescreen functions used with the check_configure_args and save time finding
 # missing dependencies.
@@ -31,7 +34,7 @@ fi
 
 # The check_configure_args are used in prechecking  and in making the ldms tar file (make dist) only.
 # Changes here do not affect ldms.spec; it must be updated separately.
-check_configure_args="--disable-static --with-pkglibdir=ovis-ldms --enable-ovis_auth --enable-ssl --enable-ovis_event --enable-zap --enable-sock --enable-rdma --disable-mmap --enable-swig --disable-readline --enable-ldms-python --enable-python --disable-libgenders --disable-genderssystemd --disable-sos --enable-flatfile --enable-csv --enable-store --disable-rabbitv3 --enable-rabbitkw --disable-kokkos --disable-cray_power_sampler --disable-cray_system_sampler --disable-aries-gpcdr --disable-gpcdlocal --disable-aries-mmr --disable-ugni --disable-perfevent --disable-papi --disable-procdiskstats --disable-atasmart --disable-hadoop --disable-generic_sampler --disable-switchx --disable-sensors --enable-dstat --enable-llnl-edac --disable-sysclassib --enable-opa2 --enable-jobinfo --enable-perf --enable-jobid --enable-array_example --enable-procinterrupts --enable-procnetdev --enable-procnfs --enable-procsensors --enable-procstat --enable-vmstat --enable-meminfo --enable-lustre --enable-slurmtest --enable-filesingle --enable-munge --enable-fabric --with-libfabric=/usr --with-boost=/usr --disable-syspapi-sampler"
+check_configure_args="--disable-static --with-pkglibdir=ovis-ldms --enable-ovis_auth --enable-ssl --enable-ovis_event --enable-zap --enable-sock --enable-rdma --disable-mmap --disable-readline --enable-ldms-python --enable-python --disable-libgenders --disable-genderssystemd --disable-sos --enable-flatfile --enable-csv --enable-store --disable-rabbitv3 --enable-rabbitkw --disable-kokkos --disable-cray_power_sampler --disable-cray_system_sampler --disable-aries-gpcdr --disable-gpcdlocal --disable-aries-mmr --disable-ugni --disable-perfevent --disable-papi --disable-procdiskstats --disable-atasmart --disable-hadoop --disable-generic_sampler --disable-switchx --disable-sensors --enable-dstat --enable-llnl-edac --disable-sysclassib --enable-opa2 --enable-jobinfo --enable-perf --enable-jobid --enable-array_example --enable-procinterrupts --enable-procnetdev --enable-procnfs --enable-procsensors --enable-procstat --enable-vmstat --enable-meminfo --enable-lustre --enable-slurmtest --enable-filesingle --enable-munge --enable-fabric --with-libfabric=/usr --with-boost=/usr --disable-syspapi-sampler"
 
 if ! pack_prechecks "$check_configure_args"; then
 	echo "Check dependencies listed above, install needed packages, and try again"
@@ -91,14 +94,17 @@ fi
 make dist
 TARGET=$(ls ovis-ldms-*.gz)
 BASETARGET=$(basename $TARGET .tar.gz)
-ldmssuffix=$(echo $BASETARGET | sed -e 's/ovis-ldms-[0-9]*.[0-9]*.[0-9]*-//')
-ldmsrelease=$(echo 1_${ldmssuffix} | sed -e 's/-/_/')
-version=$(echo $BASETARGET | sed -e 's/ovis-ldms-//' -e "s/-${ldmssuffix}$//")
+# strip name-M.M.P
+ldmssuffix=$(echo $BASETARGET | sed -e 's/ovis-ldms-[0-9]*.[0-9]*.[0-9]*//')
+# make - into _ for release, strip leading .
+ldmsrelease=$(echo ${ldmssuffix} | sed -e 's/-/_/' -e 's/^[.]//')
+# get M.M.P
+version=$(echo $BASETARGET | sed -e 's/ovis-ldms-//' -e "s/${ldmssuffix}$//")
 if test -z "$ldmssuffix"; then
 	ldmssuffix="%{nil}"
 fi
 if test -z "$ldmsrelease"; then
-	ldmsrelease="%{nil}"
+	ldmsrelease="1"
 fi
 
 echo "============================= make $packing rpms =============" && \
@@ -118,8 +124,8 @@ if ! test -f completed; then
 else
 	echo PASS
 	# generate the lists of what we built
-	./inventory.sh
 	cd $dn
+	./inventory.sh
 	echo the droids you seek may be:
 	find $PART -name '*.rpm'
 fi

@@ -1,7 +1,7 @@
 ### Build notes:
 
 The rpms here are NOT relocatable in any way.
-They omit the SOS store and its python dependencies and the papi-related samplers.
+They omit the SOS store and ldms sos plugin.
 
 Daemons install to /usr
 Runtime files appear in /var/run
@@ -39,6 +39,7 @@ cd /etc/sysconfig/ldms.d/ClusterSecrets
 ```
 and note that ldmsauth.conf must start with a valid secretword= line and have permissions 600.
 
+Alternatively, you can use munge authentication instead of the shared secret file.
 
 ### Package Dependencies:
 	gcc
@@ -52,6 +53,17 @@ and note that ldmsauth.conf must start with a valid secretword= line and have pe
 	libibverbs-devel
 	librdmacm-devel
 	openssl openssl-devel
-	python2 python2-devel
-	swig
+	python3 python3-devel
+	python36-Cyton
+	papi600
+	papi600-devel
+	munge
 	createrepo ( only needed to build a repo from the rpms )
+
+### Proxy dependency
+If your site requires use of HTTP proxies, create a file ../support/proxy_settings which exports the appropriate proxy settings, e.g.:
+
+```
+https_proxy=nouser:nopass@proxyhost.gov:80
+http_proxy=nouser:nopass@proxyhost.gov:80 
+```

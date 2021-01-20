@@ -14,61 +14,57 @@
 %global debug_package %{nil}
 %global __debug_install_post /bin/true
 %global __os_install_post /usr/lib/rpm/brp-compress %{nil}
-%if 0%{?rhel} && 0%{?rhel} <= 6
-%{!?__python2: %global __python2 /usr/bin/python2}
-%{!?python2_sitelib: %global python2_sitelib %(%{__python2} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
-%{!?python2_sitearch: %global python2_sitearch %(%{__python2} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")}
-%endif
-#%define papiversion 6.0.0
 
 # Main package
 Summary: OVIS Commands and Libraries
 Name: ovis-ldms
 Version: %{_version}
-Release: %{ldmsrelease}%{?dist}
+Release: %{?ldmsrelease}%{?dist}
 License: GPLv2 or BSD
 Group: %{ldms_all}
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-Source: ovis-ldms-%{version}-%{ldmssuffix}.tar.gz
+BuildRoot: %{_tmppath}/%{name}-%{version}%{release}-root-%(%{__id_u} -n)
+Source: ovis-ldms-%{version}%{ldmssuffix}.tar.gz
 Obsoletes: ovis < 4
 Requires: rpm >= 4.8.0
-#Requires: ovis-papi = %{papiversion}
-Requires: python2
-Requires: python2-devel
+Requires: papi600
+Requires: python3
+Requires: python3-devel
 Requires: openssl
 Requires: genders
 Requires: boost
-Requires: libfabric
-Requires: munge-libs
+Requires: munge
 BuildRequires: boost-devel boost
 BuildRequires: gettext-devel gcc glib2-devel
 BuildRequires: doxygen
 BuildRequires: openssl-devel
 BuildRequires: libibverbs-devel
 BuildRequires: librdmacm-devel
-BuildRequires: python2 python2-devel
-BuildRequires: swig
+BuildRequires: python3 python3-devel
+BuildRequires: python36-Cython
 BuildRequires: genders
+# uncomment after papi600-devel installed.
+# see toss 3.7-4 or toss/chaos.llnl.gov/yum/ch6-chaotic/x86_64/os
+# Fake libpapi/libpfm libs and include/ under /usr/papi600 until then
+#BuildRequires: papi600-devel
 BuildRequires: bison bison-devel flex flex-devel
 BuildRequires: librabbitmq librabbitmq-devel
-BuildRequires: libfabric-devel
 BuildRequires: munge-devel munge-libs
-#BuildRequires: ovis-papi-devel = %{papiversion}
-#Requires: ovis-papi = %{papiversion}
 Url: https://github.com/ovis-hpc/ovis
 
 %description
 This package provides the LDMS commands and libraries, LDMS apis and transport libraries for rhel 7.
 
 %prep
-%setup -q -n %{name}-%{version}-%{ldmssuffix}
+%setup -q -n %{name}-%{version}%{ldmssuffix}
 
 %build
 echo bTMPPATH %{_tmppath}
 rm -rf $RPM_BUILD_ROOT
 echo bBUILDROOT $RPM_BUILD_ROOT
-export CFLAGS="%{optflags} -O1 -g"
-
+export CFLAGS="%{optflags} -O1 -g -I/usr/papi600/include"
+# export CPPFLAGS="-I/usr/papi600/include"
+export LDFLAGS="-L/usr/papi600/lib64 -Wl,-rpath=/usr/papi600/lib64"
+set -x
 %configure \
 --with-boost=/usr \
 --disable-static \
@@ -80,7 +76,6 @@ export CFLAGS="%{optflags} -O1 -g"
 --enable-sock \
 --enable-rdma \
 --disable-mmap \
---enable-swig \
 --enable-doc \
 --enable-doc-html \
 --enable-doc-man \
@@ -103,13 +98,12 @@ export CFLAGS="%{optflags} -O1 -g"
 --disable-aries-mmr \
 --disable-ugni \
 --disable-perfevent \
---disable-papi \
+--enable-papi \
+--with-libpapi-prefix=/usr/papi600 \
 --disable-procdiskstats \
 --disable-atasmart \
---disable-hadoop \
 --enable-generic_sampler \
 --disable-switchx \
---disable-sensors \
 --enable-dstat \
 --enable-llnl-edac \
 --enable-sysclassib \
@@ -121,14 +115,12 @@ export CFLAGS="%{optflags} -O1 -g"
 --enable-slurm-sampler \
 --with-slurm=/usr \
 --disable-tsampler \
---enable-jobinfo \
 --enable-perf \
 --enable-jobid \
 --enable-array_example \
 --enable-procinterrupts \
 --enable-procnetdev \
 --enable-procnfs \
---enable-procsensors \
 --enable-procstat \
 --enable-vmstat \
 --enable-meminfo \
@@ -136,11 +128,9 @@ export CFLAGS="%{optflags} -O1 -g"
 --enable-slurmtest \
 --enable-filesingle \
 --enable-munge \
---enable-fabric --with-libfabric=/usr
-#--enable-syspapi-sampler \
+--with-libpapi=/usr/papi600 \
+--with-libpfm=/usr/papi600
 #--disable-papi-sampler \
-#--with-libpapi=/usr/lib64/ovis-ldms/papi-%{papiversion} \
-#--with-libpfm=/usr/lib64/ovis-ldms/papi-%{papiversion} \
 
 make V=1 %{?_smp_mflags}
 
@@ -167,12 +157,12 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 rm -f $RPM_BUILD_ROOT%{_libdir}/ovis-ldms/lib*.la
 rm -f $RPM_BUILD_ROOT%{_bindir}/test_*
 rm $RPM_BUILD_ROOT%{_bindir}/ldms_ban.sh
-find $RPM_BUILD_ROOT%{_docdir}/ovis-ldms-%{version}-%{ldmssuffix} -maxdepth 1 -type f -exec mv {} $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/ \;
+find $RPM_BUILD_ROOT%{_docdir}/ovis-ldms-%{version}%{ldmssuffix} -maxdepth 1 -type f -exec mv {} $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/ \;
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/init.d
 mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/systemd/system
-cp $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}-%{ldmssuffix}/sample_init_scripts/genders/sysv/etc/init.d/ldms* $RPM_BUILD_ROOT%{_sysconfdir}/init.d/
-cp -ar $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}-%{ldmssuffix}/sample_init_scripts/genders/systemd/etc/* $RPM_BUILD_ROOT%{_sysconfdir}
-cp -r $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}-%{ldmssuffix}/sample_init_scripts/genders/systemd/services/ldms*.service $RPM_BUILD_ROOT%{_prefix}/lib/systemd/system
+cp $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}%{ldmssuffix}/sample_init_scripts/genders/sysv/etc/init.d/ldms* $RPM_BUILD_ROOT%{_sysconfdir}/init.d/
+cp -ar $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}%{ldmssuffix}/sample_init_scripts/genders/systemd/etc/* $RPM_BUILD_ROOT%{_sysconfdir}
+cp -r $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}%{ldmssuffix}/sample_init_scripts/genders/systemd/services/ldms*.service $RPM_BUILD_ROOT%{_prefix}/lib/systemd/system
 
 mkdir -p -m 755 $RPM_BUILD_ROOT%{_localstatedir}/log/ldmsd
 mkdir -p -m 755 $RPM_BUILD_ROOT%{_localstatedir}/run/ldmsd
@@ -190,10 +180,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sbindir}/*
 %{_sbindir}/.ldms*
 #%{_sbindir}/.ldms-wrapper
-%{_datadir}/doc/%{name}-%{version}-%{ldmssuffix}/relocation
-%{_docdir}/%{name}-%{version}-%{ldmssuffix}/COPYING
-%{_docdir}/%{name}-%{version}-%{ldmssuffix}/ChangeLog
-%{_docdir}/%{name}-%{version}-%{ldmssuffix}/AUTHORS
+%{_datadir}/doc/%{name}-%{version}%{ldmssuffix}/relocation
+%{_docdir}/%{name}-%{version}%{ldmssuffix}/COPYING
+%{_docdir}/%{name}-%{version}%{ldmssuffix}/AUTHORS
 %exclude %{_bindir}/ldms-py*sh
 %exclude %{_bindir}/ldms-meminfo.sh
 %exclude %{_bindir}/ldms-static-test.sh
@@ -236,8 +225,8 @@ interest on compute nodes in production clusters.
 %{_bindir}/ldms-py*sh
 %{_bindir}/ldms-meminfo.sh
 %{_bindir}/ldms-static-test.sh
-%{_datadir}/doc/ovis-ldms-%{version}-%{ldmssuffix}/examples/static-test
-%{_datadir}/doc/ovis-ldms-%{version}-%{ldmssuffix}/examples/slurm-test
+%{_datadir}/doc/ovis-ldms-%{version}%{ldmssuffix}/examples/static-test
+%{_datadir}/doc/ovis-ldms-%{version}%{ldmssuffix}/examples/slurm-test
 #end test
 
 # initscripts
@@ -318,30 +307,32 @@ Doxygen files for ovis package.
 %files doc
 %defattr(-,root,root)
 %{_mandir}/*/*
-%{_datadir}/doc/%{name}-%{version}-%{ldmssuffix}
-%exclude %{_datadir}/doc/%{name}-%{version}-%{ldmssuffix}/relocation
-%exclude %{_datadir}/doc/ovis-ldms-%{version}-%{ldmssuffix}/examples
+%{_datadir}/doc/%{name}-%{version}%{ldmssuffix}
+%exclude %{_datadir}/doc/%{name}-%{version}%{ldmssuffix}/relocation
+%exclude %{_datadir}/doc/ovis-ldms-%{version}%{ldmssuffix}/examples
 %docdir %{_datadir}/doc
 
-%package python2
+%package python3
 Summary: Python2 files for LDMS
 Obsoletes: ovis-python2 < 4
 Group: %{ldms_all}
 Requires: python
 Requires: ovis-ldms = %{version}
 BuildRequires: python
-BuildRequires: python python-devel swig
-%description python2
+BuildRequires: python python-devel
+%description python3
 Python files for ovis
-%files python2
+%files python3
 %defattr(-,root,root)
-%{_prefix}/lib/python2.7/site-packages/ovis_ldms
-%{_prefix}/lib/python2.7/site-packages/ldmsd
+%{_prefix}/lib/python3.6/site-packages/ovis_ldms
+%{_prefix}/lib/python3.6/site-packages/ldmsd
 #end python2
 # see https://fedoraproject.org/wiki/Packaging:Python_Old
 # and https://fedoraproject.org/wiki/Packaging:Python
 
 %changelog
+* Tue Apr 21 2020 Ben Allan <baallan@sandia.gov> 4.3.4-1
+Create 4.3.6 toss non-swig, papi-6
 * Tue Apr 21 2020 Ben Allan <baallan@sandia.gov> 4.3.4-1
 Create 4.3.4 toss nonrelocatable
 * Mon Dec 9 2019 Ben Allan <baallan@sandia.gov> 4.3.1-1
