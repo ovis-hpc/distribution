@@ -42,10 +42,7 @@ BuildRequires: librdmacm-devel
 BuildRequires: python3 python3-devel
 BuildRequires: python36-Cython
 BuildRequires: genders
-# uncomment after papi600-devel installed.
-# see toss 3.7-4 or toss/chaos.llnl.gov/yum/ch6-chaotic/x86_64/os
-# Fake libpapi/libpfm libs and include/ under /usr/papi600 until then
-#BuildRequires: papi600-devel
+BuildRequires: papi600-devel
 BuildRequires: bison bison-devel flex flex-devel
 BuildRequires: librabbitmq librabbitmq-devel
 BuildRequires: munge-devel munge-libs
@@ -61,9 +58,9 @@ This package provides the LDMS commands and libraries, LDMS apis and transport l
 echo bTMPPATH %{_tmppath}
 rm -rf $RPM_BUILD_ROOT
 echo bBUILDROOT $RPM_BUILD_ROOT
-export CFLAGS="%{optflags} -O1 -g -I/usr/papi600/include"
+export CFLAGS="%{optflags} -O1 -g"
 # export CPPFLAGS="-I/usr/papi600/include"
-export LDFLAGS="-L/usr/papi600/lib64 -Wl,-rpath=/usr/papi600/lib64"
+#export LDFLAGS="-L/usr/papi600/lib64 -Wl,-rpath=/usr/papi600/lib64"
 set -x
 %configure \
 --with-boost=/usr \
